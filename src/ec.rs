@@ -191,6 +191,11 @@ macro_rules! new_curve_impl {
                     | self.z.ct_is_zero()
             }
 
+            fn a() -> Self::Base {
+                // TODO: use something like $name::curve_constant_a()
+                Self::Base::zero()
+            }
+
             fn b() -> Self::Base {
                 $name::curve_constant_b()
             }
@@ -526,6 +531,11 @@ macro_rules! new_curve_impl {
                     x, y
                 };
                 CtOption::new(p, p.is_on_curve())
+            }
+
+            fn a() -> Self::Base {
+                // TODO: use something like $name::curve_constant_a()
+                Self::Base::zero()
             }
 
             fn b() -> Self::Base {

@@ -154,6 +154,10 @@ impl CurveExt for G1 {
         todo!()
     }
 
+    fn a() -> Self::Base {
+        todo!()
+    }
+
     fn b() -> Self::Base {
         todo!()
     }
@@ -194,6 +198,10 @@ impl CurveAffine for G1Affine {
             p.y = y;
             CtOption::new(p, p.is_on_curve())
         }
+    }
+
+    fn a() -> Self::Base {
+        Fq::zero()
     }
 
     fn b() -> Self::Base {

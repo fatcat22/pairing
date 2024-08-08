@@ -42,7 +42,7 @@ pub trait CurveExt:
     fn is_on_curve(&self) -> Choice;
 
     /// Returns the curve constant a.
-    // fn a() -> Self::Base;
+    fn a() -> Self::Base;
 
     /// Returns the curve constant b.
     fn b() -> Self::Base;
@@ -85,6 +85,9 @@ pub trait CurveAffine:
     /// Returns whether or not this element is on the curve; should
     /// always be true unless an "unchecked" API was used.
     fn is_on_curve(&self) -> Choice;
+
+    /// Returns the curve constant $a$.
+    fn a() -> Self::Base;
 
     /// Returns the curve constant $b$.
     fn b() -> Self::Base;
