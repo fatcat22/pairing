@@ -22,6 +22,7 @@ new_curve_impl!(
     Fq,
     Fr,
     (G1_GENERATOR_X,G1_GENERATOR_Y),
+    G1_A,
     G1_B,
     ENDO_G1_CUBE_ROOT,
     "bn256_g1"
@@ -35,6 +36,7 @@ new_curve_impl!(
     Fq2,
     Fr,
     (G2_GENERATOR_X, G2_GENERATOR_Y),
+    G2_A,
     G2_B,
     ENDO_G2_CUBE_ROOT,
     "bn256_g2"
@@ -49,6 +51,7 @@ impl ec_gpu::GpuName for G1Affine {
 
 const G1_GENERATOR_X: Fq = Fq::one();
 const G1_GENERATOR_Y: Fq = Fq::from_raw([2, 0, 0, 0]);
+const G1_A: Fq = Fq::zero();
 const G1_B: Fq = Fq::from_raw([3, 0, 0, 0]);
 const ENDO_G1: [u64; 4] = [
     0x7a7bd9d4391eb18du64,
@@ -91,6 +94,11 @@ impl group::cofactor::CofactorGroup for G1 {
         1.into()
     }
 }
+
+const G2_A: Fq2 = Fq2 {
+    c0: Fq::zero(),
+    c1: Fq::zero(),
+};
 
 const G2_B: Fq2 = Fq2 {
     c0: Fq::from_raw([

@@ -6,6 +6,7 @@ macro_rules! new_curve_impl {
     $base:ident,
     $scalar:ident,
     $generator:expr,
+    $constant_a:expr,
     $constant_b:expr,
     $cube_root:expr,
     $curve_id:literal
@@ -38,6 +39,10 @@ macro_rules! new_curve_impl {
                 }
             }
 
+            const fn curve_constant_a() -> $base {
+                $name_affine::curve_constant_a()
+            }
+
             const fn curve_constant_b() -> $base {
                 $name_affine::curve_constant_b()
             }
@@ -49,6 +54,10 @@ macro_rules! new_curve_impl {
                     x: $generator.0,
                     y: $generator.1,
                 }
+            }
+
+            const fn curve_constant_a() -> $base {
+                $constant_a
             }
 
             const fn curve_constant_b() -> $base {
@@ -65,7 +74,7 @@ macro_rules! new_curve_impl {
                     let ysign = (rng.next_u32() % 2) as u8;
 
                     let x3 = x.square() * x;
-                    let y = (x3 + $name::curve_constant_b()).sqrt();
+                    let y = (x3 + $name::curve_constant_a()*x + $name::curve_constant_b()).sqrt();
                     if let Some(y) = Option::<$base>::from(y) {
                         let sign = y.to_bytes()[0] & 1;
                         let y = if ysign ^ sign == 0 { y } else { -y };
@@ -186,14 +195,13 @@ macro_rules! new_curve_impl {
                 let z2 = self.z.square();
                 let z4 = z2.square();
                 let z6 = z4 * z2;
-                (self.y.square() - self.x.square() * self.x)
+                (self.y.square() - self.x.square() * self.x - $name::curve_constant_a() * self.x)
                     .ct_eq(&(z6 * $name::curve_constant_b()))
                     | self.z.ct_is_zero()
             }
 
             fn a() -> Self::Base {
-                // TODO: use something like $name::curve_constant_a()
-                Self::Base::zero()
+                $name::curve_constant_a()
             }
 
             fn b() -> Self::Base {
@@ -426,7 +434,7 @@ macro_rules! new_curve_impl {
                 $base::from_bytes(&tmp).and_then(|x| {
                     CtOption::new(Self::identity(), x.ct_is_zero() & (!ysign)).or_else(|| {
                         let x3 = x.square() * x;
-                        (x3 + $name::curve_constant_b()).sqrt().and_then(|y| {
+                        (x3 + $name::curve_constant_a()*x + $name::curve_constant_b()).sqrt().and_then(|y| {
                             let sign = Choice::from(y.to_bytes()[0] & 1);
 
                             let y = $base::conditional_select(&y, &-y, ysign ^ sign);
@@ -517,7 +525,7 @@ macro_rules! new_curve_impl {
 
             fn is_on_curve(&self) -> Choice {
                 // y^2 - x^3 - ax ?= b
-                (self.y.square() - self.x.square() * self.x).ct_eq(&$name::curve_constant_b())
+                (self.y.square() - self.x.square() * self.x - $name::curve_constant_a()*self.x).ct_eq(&$name::curve_constant_b())
                     | self.is_identity()
             }
 
@@ -534,8 +542,7 @@ macro_rules! new_curve_impl {
             }
 
             fn a() -> Self::Base {
-                // TODO: use something like $name::curve_constant_a()
-                Self::Base::zero()
+                $name::curve_constant_a()
             }
 
             fn b() -> Self::Base {
